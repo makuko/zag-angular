@@ -28,6 +28,8 @@ jobs:
         run: npm audit signatures
       - name: Build lib
         run: npm run build zag-js-angular
+      - name: Copy README.md
+        run: cp README.md dist/zag-js-angular
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
