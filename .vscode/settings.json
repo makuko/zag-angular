@@ -1,0 +1,27 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+  "html.format.wrapAttributes": "force-aligned",
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+  "javascript.format.semicolons": "insert",
+  "javascript.preferences.importModuleSpecifier": "project-relative",
+  "javascript.preferences.quoteStyle": "single",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+  "typescript.format.semicolons": "insert",
+  "typescript.preferences.importModuleSpecifier": "project-relative",
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "files.insertFinalNewline": true,
+  "[json]": {
+    "editor.tabSize": 2
+  },
+  "conventionalCommits.gitmoji": false,
+  "conventionalCommits.promptBody": true,
+  "conventionalCommits.promptScopes": false,
+  "conventionalCommits.promptFooter": false
+}

@@ -1,0 +1,30 @@
+{
+  "name": "zag-js-angular",
+  "version": "0.0.0",
+  "description": "An angular wrapper for zag",
+  "keywords": [
+    "ui-machines",
+    "state-machines",
+    "zag",
+    "angular",
+    "use-machine",
+    "hook"
+  ],
+  "license": "MIT",
+  "author": "Markus Schmidt <markus.schmidt.84@gmail.com>",
+  "repository": "makuko/zag-js-angular",
+  "peerDependencies": {
+    "@angular/common": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@zag-js/core": "^1.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "release": {
+    "branches": [
+      "main"
+    ]
+  }
+}
