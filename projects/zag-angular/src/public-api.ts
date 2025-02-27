@@ -1,5 +1,5 @@
 /*
- * Public API Surface of zag-js-angular
+ * Public API Surface of zag-angular
  */
 export { mergeProps } from '@zag-js/core';
 export * from './lib/create-id';

@@ -27,11 +27,11 @@ jobs:
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: npm audit signatures
       - name: Build lib
-        run: npm run build zag-js-angular
+        run: npm run build zag-angular
       - name: Copy README.md
-        run: cp README.md dist/zag-js-angular
+        run: cp README.md dist/zag-angular
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: cd dist/zag-js-angular && npx semantic-release
+        run: cd dist/zag-angular && npx semantic-release

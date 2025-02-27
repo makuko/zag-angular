@@ -1,6 +1,6 @@
 import { Component, computed, type Signal } from '@angular/core';
 import * as tooltip from '@zag-js/tooltip';
-import { createId, normalizeProps, useMachine, ZagIt } from 'zag-js-angular';
+import { createId, normalizeProps, useMachine, ZagIt } from 'zag-angular';
 
 @Component({
     selector: 'app-tooltip',

@@ -18,8 +18,8 @@
     "target": "ES2022",
     "module": "ES2022",
     "paths": {
-      "zag-js-angular": [
-        "./projects/zag-js-angular/src/public-api.ts"
+      "zag-angular": [
+        "./projects/zag-angular/src/public-api.ts"
       ]
     }
   },

@@ -1,6 +1,6 @@
 import { Component, Signal } from '@angular/core';
 import { Api as CollapsibleApi } from '@zag-js/collapsible';
-import { ZagIt } from 'zag-js-angular';
+import { ZagIt } from 'zag-angular';
 
 @Component({
     selector: 'app-collapsible-trigger',

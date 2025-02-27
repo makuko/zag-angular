@@ -16,9 +16,9 @@ yarn add @zag-js/tooltip
 2. Install the adapter for Angular.
 
 ```bash
-npm install zag-js-angular
+npm install zag-angular
 # or
-yarn add zag-js-angular
+yarn add zag-angular
 ```
 
 > Congrats! You're ready to use tooltip machine in your project.
@@ -29,8 +29,8 @@ Here's an example of the tooltip machine used in an Angular project.
 
 ```ts
 import { Component, computed, type Signal } from "@angular/core";
-import * as tooltip from "@zag-js/tooltip"
-import { createId, normalizeProps, useMachine, ZagIt } from "zag-js-angular"
+import * as tooltip from "@zag-js/tooltip";
+import { createId, normalizeProps, useMachine, ZagIt } from "zag-angular";
 
 @Component({
   selector: "app-tooltip",
@@ -71,13 +71,9 @@ in the constructor instead of the template. Here's an example using the collapsi
 machine:
 
 ```ts
-<div {...api.getRootProps()}>
-      <button {...api.getTriggerProps()}>Collapse Trigger</button>
-      <div {...api.getContentProps()}>Collape Content</div>
-    </div>
 import { Component, computed, type Signal } from "@angular/core";
-import * as collapsible from "@zag-js/collapsible"
-import { createId, normalizeProps, useMachine, ZagIt } from "zag-js-angular"
+import * as collapsible from "@zag-js/collapsible";
+import { createId, normalizeProps, useMachine, ZagIt } from "zag-angular";
 
 @Component({
   selector: "app-collapsible",

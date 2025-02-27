@@ -1,5 +1,5 @@
 {
-  "name": "zag-js-angular",
+  "name": "zag-angular",
   "version": "0.0.0",
   "description": "An angular wrapper for zag",
   "keywords": [
@@ -12,7 +12,7 @@
   ],
   "license": "MIT",
   "author": "Markus Schmidt <markus.schmidt.84@gmail.com>",
-  "repository": "makuko/zag-js-angular",
+  "repository": "makuko/zag-angular",
   "peerDependencies": {
     "@angular/common": "^19.2.0",
     "@angular/core": "^19.2.0",

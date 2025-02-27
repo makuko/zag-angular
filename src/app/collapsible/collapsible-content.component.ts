@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ZagIt } from 'zag-js-angular';
+import { ZagIt } from 'zag-angular';
 
 @Component({
     selector: 'app-collapsible-content',

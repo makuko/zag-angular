@@ -1,6 +1,6 @@
 import { Component, computed, contentChild, effect, Signal } from '@angular/core';
 import * as collapsible from '@zag-js/collapsible';
-import { createId, normalizeProps, useMachine, ZagIt } from 'zag-js-angular';
+import { createId, normalizeProps, useMachine, ZagIt } from 'zag-angular';
 import { CollapsibleContentComponent } from './collapsible-content.component';
 import { CollapsibleTriggerComponent } from './collapsible-trigger.component';
 
