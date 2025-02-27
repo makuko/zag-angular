@@ -29,7 +29,7 @@ jobs:
       - name: Build lib
         run: npm run build zag-js-angular
       - name: Change folder
-        run: cd dist/zag-ja-angular
+        run: cd dist/zag-js-angular
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
