@@ -1,11 +1,10 @@
 import { computed, isSignal, type Signal, signal } from '@angular/core';
 import { type Bindable, type BindableParams } from '@zag-js/core';
-import { isEqual } from '@zag-js/utils';
 
 export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
     const initial = props().value ?? props().defaultValue;
 
-    const eq = props().isEqual ?? isEqual;
+    const eq = props().isEqual ?? Object.is;
 
     const value = signal(initial as T);
     const controlled = computed(() => props().value !== undefined);
