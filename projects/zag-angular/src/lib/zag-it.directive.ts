@@ -24,6 +24,7 @@ export class ZagIt implements OnDestroy {
             const prev = this.prev;
             const next = this.prev = this.next();
 
+
             if (!isEqual(prev, next)) {
                 this.handleAttrs(prev, next);
             }

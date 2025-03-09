@@ -11,23 +11,6 @@ export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
 
     const ref = computed(() => controlled() ? props().value : value());
 
-    const set = (v: T | Signal<T>) => {
-        const prev = value();
-        const next = isSignal(v) ? v() : v;
-
-        if (props().debug) {
-            console.log(`[bindable > ${ props().debug }] setValue`, { next, prev });
-        }
-
-        if (!controlled()) {
-            value.set(next);
-        }
-
-        if (!eq(next, prev)) {
-            props().onChange?.(next, prev);
-        }
-    };
-
     return {
         initial,
         ref,
@@ -37,7 +20,20 @@ export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
             return isSignal(v) ? v() : v as T;
         },
         set(v: T | Signal<T>) {
-            Promise.resolve().then(() => set(v));
+            const prev = value();
+            const next = isSignal(v) ? v() : v;
+
+            if (props().debug) {
+                console.log(`[bindable > ${ props().debug }] setValue`, { next, prev });
+            }
+
+            if (!controlled()) {
+                value.set(next);
+            }
+
+            if (!eq(next, prev)) {
+                props().onChange?.(next, prev);
+            }
         },
         invoke(nextValue: T, prevValue: T) {
             props().onChange?.(nextValue, prevValue);

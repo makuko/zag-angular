@@ -8,9 +8,7 @@ export function createRefs<T>(refs: T) {
             return ref()[key];
         },
         set<K extends keyof T>(key: K, value: T[K]) {
-            Promise.resolve().then(
-                () => ref.update(prev => ({ ...prev, [key]: value }))
-            );
+            ref.update(prev => ({ ...prev, [key]: value }));
         }
     };
 }
