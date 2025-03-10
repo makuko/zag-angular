@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, computed, Signal } from '@angular/core';
+import { Api as CollapsibleApi } from '@zag-js/collapsible';
 import { ZagIt } from 'zag-angular';
 
 @Component({
@@ -47,6 +48,10 @@ import { ZagIt } from 'zag-angular';
 })
 export class CollapsibleContentComponent {
 
-    constructor(public readonly zagIt: ZagIt) { }
+    private readonly api!: Signal<CollapsibleApi>;
+
+    constructor(zagIt: ZagIt) {
+        zagIt.next = computed(() => this.api().getContentProps());
+    }
 
 }

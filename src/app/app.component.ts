@@ -32,32 +32,38 @@ import { TooltipComponent } from './tooltip/tooltip.component';
         </div>
 
         <div class='container'>
-            <app-accordion>
-                <app-accordion-item>
-                    <app-accordion-header>
-                        Header 1
-                    </app-accordion-header>
-                    <app-accordion-content>
-                        Super awesome content 1.
-                    </app-accordion-content>
-                </app-accordion-item>
-                <app-accordion-item>
-                    <app-accordion-header>
-                        Header 2
-                    </app-accordion-header>
-                    <app-accordion-content>
-                        Super awesome content 2.
-                    </app-accordion-content>
-                </app-accordion-item>
-                <app-accordion-item>
-                    <app-accordion-header>
-                        Header 3
-                    </app-accordion-header>
-                    <app-accordion-content>
-                        Super awesome content 3.
-                    </app-accordion-content>
-                </app-accordion-item>
-            </app-accordion>
+            @if (showAccordion) {
+                <app-accordion [multiple]="true" [collapsible]="true" [value]="['item1', 'item2']">
+                    <app-accordion-item value="item1">
+                        <app-accordion-header>
+                            Header 1
+                        </app-accordion-header>
+                        <app-accordion-content>
+                            Super awesome content 1.
+                        </app-accordion-content>
+                    </app-accordion-item>
+                    <app-accordion-item value="item2">
+                        <app-accordion-header>
+                            Header 2
+                        </app-accordion-header>
+                        <app-accordion-content>
+                            Super awesome content 2.
+                        </app-accordion-content>
+                    </app-accordion-item>
+                    <app-accordion-item value="item3">
+                        <app-accordion-header>
+                            Header 3
+                        </app-accordion-header>
+                        <app-accordion-content>
+                            Super awesome content 3.
+                        </app-accordion-content>
+                    </app-accordion-item>
+                </app-accordion>
+            }
+        </div>
+
+        <div class="container">
+            <button (click)="showAccordion = !showAccordion">Toggle Accordion</button>
         </div>
     `,
     styles: `
@@ -66,4 +72,8 @@ import { TooltipComponent } from './tooltip/tooltip.component';
         }
     `
 })
-export class AppComponent { }
+export class AppComponent {
+
+    public showAccordion = false;
+
+}

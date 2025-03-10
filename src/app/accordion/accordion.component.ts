@@ -44,7 +44,7 @@ export class AccordionComponent {
         effect(() => {
             for (const item of this.items()) {
                 // @ts-expect-error Initialization
-                item.is = this.id;
+                item.id = this.id;
                 // @ts-expect-error Initialization
                 item.accordionApi = this.api;
             }

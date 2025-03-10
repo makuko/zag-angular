@@ -29,20 +29,17 @@ export class CollapsibleComponent {
     private content = contentChild.required(CollapsibleContentComponent);
 
     constructor(zagIt: ZagIt) {
-        const service = useMachine(collapsible.machine, { id: this.id });
+        const service = useMachine(collapsible.machine, { id: this.id, defaultOpen: true });
 
         this.api = computed(() => collapsible.connect(service, normalizeProps));
 
         zagIt.next = computed(() => this.api().getRootProps());
 
-        effect(() => {
-            // @ts-expect-error initialization
-            this.trigger()['api'] = this.api;
-        });
+        // @ts-expect-error initialization
+        effect(() => this.trigger().api = this.api);
 
-        effect(() => {
-            this.content().zagIt.next = computed(() => this.api().getContentProps());
-        });
+        // @ts-expect-error initialization
+        effect(() => this.content().api = this.api);
     }
 
 }

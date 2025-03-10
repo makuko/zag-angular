@@ -1,4 +1,16 @@
-import { Component, computed, contentChild, effect, input, Signal, untracked } from '@angular/core';
+import {
+    AfterContentInit,
+    afterNextRender,
+    Component,
+    computed,
+    contentChild,
+    effect,
+    Injector,
+    input,
+    runInInjectionContext,
+    Signal,
+    untracked
+} from '@angular/core';
 import { Api as AccordionApi } from '@zag-js/accordion';
 import * as collapsible from '@zag-js/collapsible';
 import { createId, normalizeProps, useMachine, ZagIt } from 'zag-angular';
@@ -19,7 +31,7 @@ import { AccordionHeaderComponent } from './accordion-header.component';
     `,
     hostDirectives: [ZagIt]
 })
-export class AccordionItemComponent {
+export class AccordionItemComponent implements AfterContentInit {
 
     public readonly value = input(createId());
 
@@ -27,36 +39,17 @@ export class AccordionItemComponent {
 
     private readonly accordionApi!: Signal<AccordionApi>;
 
-    private readonly collapsibleApi: Signal<collapsible.Api>;
+    private readonly collapsibleApi!: Signal<collapsible.Api>;
 
     private readonly header = contentChild.required(AccordionHeaderComponent);
 
     private readonly content = contentChild.required(AccordionContentComponent);
 
-    constructor(zagIt: ZagIt) {
-        const value = this.value;
-
-        const collapsibleService = useMachine(
-            collapsible.machine,
-            computed(() => ({
-                id: value(),
-                ids: {
-                    content: `accordion:${ this.id }:content:${ value() }`
-                }
-            }))
-        );
-
-        this.collapsibleApi = computed(() => collapsible.connect(collapsibleService, normalizeProps));
-
-        zagIt.next = computed(() => this.accordionApi().getItemProps({ value: value() }));
-
-        effect(() => {
-            const accordionApi = this.accordionApi();
-
-            untracked(
-                () => this.collapsibleApi().setOpen(accordionApi.getItemState({ value: value() }).expanded)
-            );
-        });
+    constructor(
+        private injector: Injector,
+        zagIt: ZagIt
+    ) {
+        zagIt.next = computed(() => this.accordionApi().getItemProps({ value: this.value() }));
 
         effect(() => {
             const header = this.header();
@@ -74,8 +67,37 @@ export class AccordionItemComponent {
             content.value = this.value;
             // @ts-expect-error Initialization
             content.accordionApi = this.accordionApi;
+        });
+    }
+
+    public ngAfterContentInit() {
+        runInInjectionContext(this.injector, () => {
+            const value = this.value;
+
+            const collapsibleService = useMachine(
+                collapsible.machine,
+                computed(() => ({
+                    id: value(),
+                    ids: {
+                        content: `accordion:${ this.id }:content:${ value() }`
+                    },
+                    defaultOpen: this.accordionApi().getItemState({ value: value() }).expanded
+                }))
+            );
+
             // @ts-expect-error Initialization
-            content.collapsibleApi = this.collapsibleApi;
+            this.collapsibleApi = computed(() => collapsible.connect(collapsibleService, normalizeProps));
+
+            // @ts-expect-error Initialization
+            effect(() => this.content().collapsibleApi.set(this.collapsibleApi()));
+
+            afterNextRender(() => this.collapsibleApi().measureSize());
+
+            effect(() => {
+                const accordionApi = this.accordionApi();
+
+                untracked(() => this.collapsibleApi().setOpen(accordionApi.getItemState({ value: value() }).expanded));
+            });
         });
     }
 
