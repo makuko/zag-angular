@@ -5,6 +5,7 @@ import {
     computed,
     contentChild,
     effect,
+    inject,
     Injector,
     input,
     runInInjectionContext,
@@ -45,11 +46,12 @@ export class AccordionItemComponent implements AfterContentInit {
 
     private readonly content = contentChild.required(AccordionContentComponent);
 
-    constructor(
-        private injector: Injector,
-        zagIt: ZagIt
-    ) {
-        zagIt.next = computed(() => this.accordionApi().getItemProps({ value: this.value() }));
+    private readonly injector = inject(Injector);
+
+    private readonly zagIt = inject(ZagIt);
+
+    constructor() {
+        this.zagIt.next = computed(() => this.accordionApi().getItemProps({ value: this.value() }));
 
         effect(() => {
             const header = this.header();

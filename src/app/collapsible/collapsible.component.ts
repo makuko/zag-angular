@@ -1,4 +1,4 @@
-import { Component, computed, contentChild, effect, Signal } from '@angular/core';
+import { Component, computed, contentChild, effect, inject, Signal } from '@angular/core';
 import * as collapsible from '@zag-js/collapsible';
 import { createId, normalizeProps, useMachine, ZagIt } from 'zag-angular';
 import { CollapsibleContentComponent } from './collapsible-content.component';
@@ -24,22 +24,28 @@ export class CollapsibleComponent {
 
     public readonly api: Signal<collapsible.Api>;
 
-    private trigger = contentChild.required(CollapsibleTriggerComponent);
+    private readonly trigger = contentChild.required(CollapsibleTriggerComponent);
 
-    private content = contentChild.required(CollapsibleContentComponent);
+    private readonly content = contentChild.required(CollapsibleContentComponent);
 
-    constructor(zagIt: ZagIt) {
+    private readonly zagIt = inject(ZagIt);
+
+    constructor() {
         const service = useMachine(collapsible.machine, { id: this.id, defaultOpen: true });
 
         this.api = computed(() => collapsible.connect(service, normalizeProps));
 
-        zagIt.next = computed(() => this.api().getRootProps());
+        this.zagIt.next = computed(() => this.api().getRootProps());
 
         // @ts-expect-error initialization
         effect(() => this.trigger().api = this.api);
 
         // @ts-expect-error initialization
         effect(() => this.content().api = this.api);
+    }
+
+    public ngAfterViewInit() {
+        this.api().measureSize();
     }
 
 }

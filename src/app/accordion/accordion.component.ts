@@ -1,4 +1,4 @@
-import { Component, computed, contentChildren, effect, input, model, Signal } from '@angular/core';
+import { Component, computed, contentChildren, effect, inject, input, model, Signal } from '@angular/core';
 import * as accordion from '@zag-js/accordion';
 import { createId, normalizeProps, useMachine, ZagIt } from 'zag-angular';
 import { AccordionItemComponent } from './accordion-item.component';
@@ -25,7 +25,9 @@ export class AccordionComponent {
 
     private readonly items = contentChildren(AccordionItemComponent);
 
-    constructor(zagIt: ZagIt) {
+    private readonly zagIt = inject(ZagIt);
+
+    constructor() {
         const service = useMachine(
             accordion.machine,
             computed(() => ({
@@ -39,7 +41,7 @@ export class AccordionComponent {
 
         this.api = computed(() => accordion.connect(service, normalizeProps));
 
-        zagIt.next = computed(() => this.api().getRootProps());
+        this.zagIt.next = computed(() => this.api().getRootProps());
 
         effect(() => {
             for (const item of this.items()) {

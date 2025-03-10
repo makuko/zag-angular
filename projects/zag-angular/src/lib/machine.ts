@@ -268,42 +268,40 @@ export function useMachine<T extends MachineSchema>(
 
     // TODO: Add EventType
     const send = (event: any) => {
-        Promise.resolve().then(() => {
-            previousEventRef = eventRef;
-            eventRef = event;
+        previousEventRef = eventRef;
+        eventRef = event;
 
-            debug('send', event);
+        debug('send', event);
 
-            const currentState = state.get();
+        const currentState = state.get();
 
-            // @ts-expect-error index signature
-            const transitions = machine.states[currentState].on?.[event.type] ?? machine.on?.[event.type];
+        // @ts-expect-error index signature
+        const transitions = machine.states[currentState].on?.[event.type] ?? machine.on?.[event.type];
 
-            const transition = choose(transitions);
+        const transition = choose(transitions);
 
-            if (!transition) {
-                return;
-            }
+        if (!transition) {
+            return;
+        }
 
-            debug('transition', transition);
+        debug('transition', transition);
 
-            // save current transition
-            transitionRef = transition;
+        // save current transition
+        transitionRef = transition;
 
-            const target = transition.target ?? currentState;
-            const changed = target !== currentState;
+        const target = transition.target ?? currentState;
+        const changed = target !== currentState;
 
-            if (changed) {
-                // state change is high priority
-                state.set(target);
-            } else if (transition.reenter) {
-                // reenter will re-invoke the current state
-                state.invoke(currentState, currentState);
-            } else {
-                // call transition actions
-                action(transition.actions);
-            }
-        });
+        if (changed) {
+            // state change is high priority
+            state.set(target);
+        } else if (transition.reenter) {
+            // reenter will re-invoke the current state
+            state.invoke(currentState, currentState);
+        } else {
+            // call transition actions
+            action(transition.actions);
+        }
     };
 
     machine.watch?.(getParams());

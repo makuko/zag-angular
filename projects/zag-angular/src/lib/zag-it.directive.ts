@@ -1,4 +1,14 @@
-import { computed, Directive, effect, ElementRef, input, OnDestroy, Renderer2, RendererStyleFlags2 } from '@angular/core';
+import {
+    afterRenderEffect,
+    computed,
+    Directive,
+    ElementRef,
+    inject,
+    input,
+    OnDestroy,
+    Renderer2,
+    RendererStyleFlags2
+} from '@angular/core';
 import { isEqual, isNumber, isString } from '@zag-js/utils';
 import { Dict, StyleObject } from './normalize-props';
 
@@ -16,16 +26,19 @@ export class ZagIt implements OnDestroy {
 
     private readonly listeners = new Map<string, VoidFunction>();
 
-    constructor(
-        private renderer: Renderer2,
-        private elementRef: ElementRef<HTMLElement>
-    ) {
-        effect(() => {
-            const prev = this.prev;
-            const next = this.prev = this.next();
+    private renderer = inject(Renderer2);
 
-            if (!isEqual(prev, next)) {
-                this.handleAttrs(prev, next);
+    private elementRef = inject(ElementRef<HTMLElement>);
+
+    constructor() {
+        afterRenderEffect({
+            write: () => {
+                const prev = this.prev;
+                const next = this.prev = this.next();
+
+                if (!isEqual(prev, next)) {
+                    this.handleAttrs(prev, next);
+                }
             }
         });
     }

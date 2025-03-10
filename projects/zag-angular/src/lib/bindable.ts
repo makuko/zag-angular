@@ -9,6 +9,7 @@ export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
     const value = signal(initial as T);
     const controlled = computed(() => props().value !== undefined);
 
+    // TODO: Check if this is even needed. Seems to be unused.
     const ref = computed(() => controlled() ? props().value : value());
 
     return {

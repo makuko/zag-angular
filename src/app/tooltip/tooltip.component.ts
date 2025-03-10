@@ -17,7 +17,7 @@ import { createId, normalizeProps, useMachine, ZagIt } from 'zag-angular';
 })
 export class TooltipComponent {
 
-    api: Signal<tooltip.Api>;
+    public readonly api: Signal<tooltip.Api>;
 
     constructor() {
         const service = useMachine(tooltip.machine, { id: createId() });
