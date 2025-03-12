@@ -71,7 +71,7 @@ in the constructor instead of the template. Here's an example using the collapsi
 machine:
 
 ```ts
-import { Component, computed, type Signal } from "@angular/core";
+import { Component, computed, inject, type Signal } from "@angular/core";
 import * as collapsible from "@zag-js/collapsible";
 import { createId, normalizeProps, useMachine, ZagIt } from "zag-angular";
 
@@ -87,12 +87,13 @@ import { createId, normalizeProps, useMachine, ZagIt } from "zag-angular";
 })
 export class CollapsibleComponent {
   api: Signal<collapsible.Api>;
-  constructor(zagIt: ZagIt) {
+  zagIt = inject(ZagIt);
+  constructor() {
     const service = useMachine(collapsible.machine, { id: createId() });
 
     this.api = computed(() => collapsible.connect(service, normalizeProps));
 
-    zagIt.next = computed(() => this.api().getRootProps());
+    this.zagIt.next = computed(() => this.api().getRootProps());
   }
 }
 ```
