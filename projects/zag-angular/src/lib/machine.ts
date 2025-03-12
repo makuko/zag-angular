@@ -37,9 +37,7 @@ export function useMachine<T extends MachineSchema>(
     const props = computedSignal(
         () => machine.props?.({
             props: compact(access(userProps)),
-            get scope() {
-                return scope();
-            }
+            scope: scope()
         }) ?? access(userProps)
     );
 
@@ -202,9 +200,10 @@ export function useMachine<T extends MachineSchema>(
             event: eventRef,
             prop,
             refs,
-            get scope() {
-                return scope();
-            },
+            // get scope() {
+            //     return scope();
+            // },
+            scope: scope(),
             computed
         });
     };
@@ -267,7 +266,7 @@ export function useMachine<T extends MachineSchema>(
     });
 
     // TODO: Add EventType
-    const send = (event: any) => {
+    const _send = (event: any) => {
         previousEventRef = eventRef;
         eventRef = event;
 
@@ -302,6 +301,17 @@ export function useMachine<T extends MachineSchema>(
             // call transition actions
             action(transition.actions);
         }
+    };
+
+    const send = (event: any) => {
+        // TODO: Remove this when issue with menu have been resolved
+        if (!['MENU_POINTERENTER', 'POINTER_MOVED_AWAY_FROM_SUBMENU'].includes(event.type)) {
+            _send(event);
+
+            return;
+        }
+
+        setTimeout(() => _send(event));
     };
 
     machine.watch?.(getParams());

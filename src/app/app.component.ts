@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AccordionComponent, AccordionContentComponent, AccordionHeaderComponent, AccordionItemComponent } from './accordion';
 import { CollapsibleComponent, CollapsibleContentComponent, CollapsibleTriggerComponent } from './collapsible';
+import { MenuComponent } from './menu/menu.compponent';
 import { TooltipComponent } from './tooltip/tooltip.component';
 
 @Component({
@@ -13,7 +14,8 @@ import { TooltipComponent } from './tooltip/tooltip.component';
         AccordionComponent,
         AccordionHeaderComponent,
         AccordionItemComponent,
-        AccordionContentComponent
+        AccordionContentComponent,
+        MenuComponent
     ],
     template: `
         <div class='container'>
@@ -29,6 +31,10 @@ import { TooltipComponent } from './tooltip/tooltip.component';
 
         <div class='container'>
             <app-tooltip></app-tooltip>
+        </div>
+
+        <div class="container">
+            <app-menu></app-menu>
         </div>
 
         <div class='container'>
