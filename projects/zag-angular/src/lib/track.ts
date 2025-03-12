@@ -1,8 +1,8 @@
-import { effect, isSignal, Signal } from '@angular/core';
-import { isEqual } from '@zag-js/utils';
+import { effect } from '@angular/core';
+import { isEqual, isFunction } from '@zag-js/utils';
 
-export function access<T>(value: T | Signal<T>): T {
-    return isSignal(value) ? value() : value;
+function access<T>(value: T | (() => T)): T {
+    return isFunction(value) ? value() : value;
 }
 
 export const track = (deps: any[], _effect: VoidFunction) => {

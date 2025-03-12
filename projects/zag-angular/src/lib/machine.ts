@@ -1,4 +1,4 @@
-import { afterRenderEffect, computed as computedSignal, untracked, type Signal } from '@angular/core';
+import { afterRenderEffect, computed as computedSignal, isSignal, untracked, type Signal } from '@angular/core';
 import type {
     ActionsOrFn,
     BindableContext,
@@ -16,7 +16,7 @@ import { createScope } from '@zag-js/core';
 import { compact, ensure, isFunction, isString, toArray, warn } from '@zag-js/utils';
 import { bindable } from './bindable';
 import { createRefs } from './refs';
-import { access, track } from './track';
+import { track } from './track';
 
 export function useMachine<T extends MachineSchema>(
     machine: Machine<T>,
@@ -322,6 +322,10 @@ export function useMachine<T extends MachineSchema>(
 
 function flush(fn: VoidFunction) {
     fn();
+}
+
+function access<T>(value: T | Signal<T>) {
+    return isSignal(value) ? value() : value;
 }
 
 function createProp<T>(value: Signal<T>) {
