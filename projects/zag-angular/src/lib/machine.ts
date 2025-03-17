@@ -266,7 +266,7 @@ export function useMachine<T extends MachineSchema>(
     });
 
     // TODO: Add EventType
-    const _send = (event: any) => {
+    const send = (event: any) => {
         previousEventRef = eventRef;
         eventRef = event;
 
@@ -301,17 +301,6 @@ export function useMachine<T extends MachineSchema>(
             // call transition actions
             action(transition.actions);
         }
-    };
-
-    const send = (event: any) => {
-        // TODO: Remove this when issue with menu have been resolved
-        if (!['MENU_POINTERENTER', 'POINTER_MOVED_AWAY_FROM_SUBMENU'].includes(event.type)) {
-            _send(event);
-
-            return;
-        }
-
-        setTimeout(() => _send(event));
     };
 
     machine.watch?.(getParams());

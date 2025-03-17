@@ -1,5 +1,5 @@
 import { createNormalizer, PropTypes } from '@zag-js/types';
-import { isNumber, isObject, isString } from '@zag-js/utils';
+import { isObject, isString } from '@zag-js/utils';
 
 const propMap: Record<string, string> = {
     onFocus: 'onfocusin',
@@ -27,7 +27,7 @@ const preserveKeys = [
     'strokeMiterlimit'
 ];
 
-export type StyleObject = Record<string, string>;
+export type StyleObject = Record<string, string | number>;
 
 export type Dict = Record<string, boolean | number | string | EventListener | StyleObject | undefined>;
 
@@ -35,7 +35,7 @@ export const normalizeProps = createNormalizer<PropTypes<Dict>>(props => {
     const normalized: Dict = {};
 
     for (const [key, value] of Object.entries(props)) {
-        if (key === 'style' && isString(value)) {
+        if (key === 'style') {
             if (isString(value)) {
                 normalized['style'] = serializeStyle(value);
             } else if (isObject(value)) {
@@ -77,11 +77,11 @@ function hyphenateStyle(style: Record<string, string | number>): StyleObject {
     const res: StyleObject = {};
 
     for (const [property, value] of Object.entries(style)) {
-        if (isString(value)) {
-            res[hyphenateStyleName(property)] = value;
-        } else if (isNumber(value)) {
-            res[hyphenateStyleName(property)] = `${ value }px`;
+        if (value === null || value === undefined) {
+            continue;
         }
+
+        res[hyphenateStyleName(property)] = value;
     }
 
     return res;
@@ -102,7 +102,7 @@ function hyphenateStyleName(name: string) {
 
     const hName = name.replace(uppercasePattern, toHyphenLower);
 
-    return cache.set(name, msPattern.test(hName) ? "-" + hName : hName).get(name)!;
+    return cache.set(name, msPattern.test(hName) ? '-' + hName : hName).get(name)!;
 }
 
 function toHyphenLower(match: string) {

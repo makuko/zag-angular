@@ -1,4 +1,4 @@
-import { computed, effect, isSignal, signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { type Bindable, type BindableParams } from '@zag-js/core';
 import { isFunction } from '@zag-js/utils';
 
@@ -10,27 +10,17 @@ export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
     const value = signal(initial as T);
     const controlled = computed(() => props().value !== undefined);
 
-    const valueRef = { current: value() };
-    const prevValue: { current: T | undefined; } = { current: undefined };
-
-    effect(() => {
-        const v = controlled() ? props().value : value();
-
-        prevValue.current = v;
-        valueRef.current = v as T;
-    });
+    const valueRef = computed(() => controlled() ? props().value! : value());
 
     return {
         initial,
         ref: valueRef,
         get(): T {
-            const v = (controlled() ? props().value : value);
-
-            return isSignal(v) ? v() : v as T;
+            return valueRef();
         },
         set(v: T | ((prev: T) => T)) {
-            const prev = prevValue.current;
-            const next = isFunction(v) ? v(valueRef.current) : v;
+            const prev = valueRef();
+            const next = isFunction(v) ? v(prev) : v;
 
             if (props().debug) {
                 console.log(`[bindable > ${ props().debug }] setValue`, { next, prev });

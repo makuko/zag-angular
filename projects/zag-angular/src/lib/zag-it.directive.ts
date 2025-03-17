@@ -171,7 +171,7 @@ export class ZagIt implements OnDestroy {
         const el = elementRef.nativeElement;
 
         for (const name of Object.keys(style)) {
-            renderer.removeStyle(el, name);
+            renderer.removeStyle(el, name, RendererStyleFlags2.DashCase);
         }
     }
 

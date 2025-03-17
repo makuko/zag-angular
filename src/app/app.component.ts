@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
+import { createId } from 'zag-angular';
 import { AccordionComponent, AccordionContentComponent, AccordionHeaderComponent, AccordionItemComponent } from './accordion';
 import { CollapsibleComponent, CollapsibleContentComponent, CollapsibleTriggerComponent } from './collapsible';
 import { MenuComponent } from './menu/menu.compponent';
+import { toaster, ToasterComponent } from './toast';
 import { TooltipComponent } from './tooltip/tooltip.component';
 
 @Component({
@@ -15,7 +17,8 @@ import { TooltipComponent } from './tooltip/tooltip.component';
         AccordionHeaderComponent,
         AccordionItemComponent,
         AccordionContentComponent,
-        MenuComponent
+        MenuComponent,
+        ToasterComponent
     ],
     template: `
         <div class='container'>
@@ -71,6 +74,12 @@ import { TooltipComponent } from './tooltip/tooltip.component';
         <div class="container">
             <button (click)="showAccordion = !showAccordion">Toggle Accordion</button>
         </div>
+
+        <div class=container>
+            <button (click)="showToast()">Show Toast</button>
+        </div>
+
+        <app-toaster/>
     `,
     styles: `
         .container {
@@ -81,5 +90,14 @@ import { TooltipComponent } from './tooltip/tooltip.component';
 export class AppComponent {
 
     public showAccordion = false;
+
+    public showToast() {
+        toaster.create({
+            id: createId(),
+            title: 'Data submitted!',
+            description: 'The description of the toast.',
+            type: 'info'
+        });
+    }
 
 }

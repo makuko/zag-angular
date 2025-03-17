@@ -132,7 +132,6 @@ export class MenuComponent {
     shareMenuOutlet = new DomPortalOutlet(document.body);
 
     constructor() {
-        menu.machine.debug = true;
         // Level 1 - File Menu
         const fileMenuService = useMachine(
             menu.machine,
