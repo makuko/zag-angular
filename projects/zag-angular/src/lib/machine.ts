@@ -41,7 +41,7 @@ export function useMachine<T extends MachineSchema>(
         }) ?? access(userProps)
     );
 
-    const prop = createProp<T['props']>(props);
+    const prop = useProp<T['props']>(props);
 
     const context = machine.context?.({
         prop,
@@ -55,6 +55,9 @@ export function useMachine<T extends MachineSchema>(
         },
         getComputed() {
             return computed;
+        },
+        getRefs() {
+            return refs;
         }
     });
 
@@ -200,9 +203,6 @@ export function useMachine<T extends MachineSchema>(
             event: eventRef,
             prop,
             refs,
-            // get scope() {
-            //     return scope();
-            // },
             scope: scope(),
             computed
         });
@@ -327,7 +327,7 @@ function access<T>(value: T | Signal<T>) {
     return isSignal(value) ? value() : value;
 }
 
-function createProp<T>(value: Signal<T>) {
+function useProp<T>(value: Signal<T>) {
     return function get<K extends keyof T>(key: K): T[K] {
         return value()[key];
     };
