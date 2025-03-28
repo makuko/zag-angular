@@ -12,7 +12,7 @@ import type {
     Service,
     Transition,
 } from '@zag-js/core';
-import { createScope } from '@zag-js/core';
+import { createScope, INIT_STATE, MachineStatus } from '@zag-js/core';
 import { compact, ensure, isFunction, isString, toArray, warn } from '@zag-js/utils';
 import { bindable } from './bindable';
 import { createRefs } from './refs';
@@ -237,13 +237,13 @@ export function useMachine<T extends MachineSchema>(
             }
 
             // root entry actions
-            if (prevState === '__init__') {
+            if (prevState === INIT_STATE) {
                 action(machine.entry);
 
                 const cleanup = effect(machine.effects);
 
                 if (cleanup) {
-                    effectsRef.set('__init__', cleanup);
+                    effectsRef.set(INIT_STATE, cleanup);
                 }
             }
 
@@ -252,21 +252,37 @@ export function useMachine<T extends MachineSchema>(
         }
     }));
 
+    let status = MachineStatus.NotStarted;
+
     afterRenderEffect(onCleanup => {
-        untracked(() => state.invoke(state.initial, '__init__'));
+        const started = status === MachineStatus.Started;
+
+        status = MachineStatus.Started;
+
+        debug(started ? 'rehydrating...' : 'initializing...');
+
+        untracked(() => state.invoke(state.initial, INIT_STATE));
 
         onCleanup(() => {
+            debug('unmounting...');
+
+            status = MachineStatus.Stopped;
+
             effectsRef.forEach(fn => fn());
 
             effectsRef = new Map();
+            transitionRef = null;
 
-            // root exit actions
             action(machine.exit);
         });
     });
 
     // TODO: Add EventType
     const send = (event: any) => {
+        if (status !== MachineStatus.Started) {
+            return;
+        }
+
         previousEventRef = eventRef;
         eventRef = event;
 
@@ -315,7 +331,8 @@ export function useMachine<T extends MachineSchema>(
         },
         refs,
         computed,
-        event: getEvent()
+        event: getEvent(),
+        getStatus: () => status
     } as Service<T>;
 }
 
