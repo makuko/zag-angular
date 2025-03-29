@@ -1,6 +1,4 @@
 import {
-    AfterContentInit,
-    afterNextRender,
     Component,
     computed,
     contentChild,
@@ -8,7 +6,9 @@ import {
     inject,
     Injector,
     input,
+    OnInit,
     runInInjectionContext,
+    signal,
     Signal,
     untracked
 } from '@angular/core';
@@ -32,15 +32,17 @@ import { AccordionHeaderComponent } from './accordion-header.component';
     `,
     hostDirectives: [ZagIt]
 })
-export class AccordionItemComponent implements AfterContentInit {
+export class AccordionItemComponent implements OnInit {
 
     public readonly value = input(createId());
 
-    private readonly id!: string;
+    private readonly open = signal<boolean | undefined>(undefined);
 
     private readonly accordionApi!: Signal<AccordionApi>;
 
     private readonly collapsibleApi!: Signal<collapsible.Api>;
+
+    private readonly collapsibleService!: collapsible.Service;
 
     private readonly header = contentChild.required(AccordionHeaderComponent);
 
@@ -51,7 +53,26 @@ export class AccordionItemComponent implements AfterContentInit {
     private readonly zagIt = inject(ZagIt);
 
     constructor() {
+        this.collapsibleApi = computed(() => collapsible.connect(this.collapsibleService, normalizeProps));
+
         this.zagIt.next = computed(() => this.accordionApi().getItemProps({ value: this.value() }));
+
+        effect(() => {
+            const open = this.accordionApi().getItemState({ value: this.value() }).expanded;
+
+            if (open === this.open()) {
+                return;
+            }
+
+            if (open) {
+                this.open.set(open);
+
+                return;
+            }
+
+            untracked(() => this.collapsibleApi().measureSize());
+            queueMicrotask(() => this.open.set(false));
+        });
 
         effect(() => {
             const header = this.header();
@@ -69,37 +90,26 @@ export class AccordionItemComponent implements AfterContentInit {
             content.value = this.value;
             // @ts-expect-error Initialization
             content.accordionApi = this.accordionApi;
+            // @ts-expect-error Initialization
+            content.collapsibleApi = this.collapsibleApi;
         });
     }
 
-    public ngAfterContentInit() {
+    public ngOnInit() {
         runInInjectionContext(this.injector, () => {
-            const value = this.value;
-
-            const collapsibleService = useMachine(
+            // @ts-expect-error Initialization
+            this.collapsibleService = useMachine(
                 collapsible.machine,
                 computed(() => ({
-                    id: value(),
+                    id: this.value(),
                     ids: {
-                        content: `accordion:${ this.id }:content:${ value() }`
+                        content: this.accordionApi().getItemContentProps({ value: this.value() })['id']
                     },
-                    defaultOpen: this.accordionApi().getItemState({ value: value() }).expanded
+                    open: this.open() === undefined
+                        ? this.accordionApi().getItemState({ value: this.value() }).expanded
+                        : this.open()
                 }))
             );
-
-            // @ts-expect-error Initialization
-            this.collapsibleApi = computed(() => collapsible.connect(collapsibleService, normalizeProps));
-
-            // @ts-expect-error Initialization
-            effect(() => this.content().collapsibleApi.set(this.collapsibleApi()));
-
-            afterNextRender(() => this.collapsibleApi().measureSize());
-
-            effect(() => {
-                const accordionApi = this.accordionApi();
-
-                untracked(() => this.collapsibleApi().setOpen(accordionApi.getItemState({ value: value() }).expanded));
-            });
         });
     }
 

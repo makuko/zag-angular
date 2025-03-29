@@ -83,7 +83,7 @@ import { Dict, normalizeProps, useMachine, ZagIt } from 'zag-angular';
                 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
 
-        [data-scope="menu"][data-part="content"]:is(:focus, [data-focus]) {
+        [data-scope="menu"][data-part="content"]:is(:focus-visible, [data-focus]) {
             outline: 2px solid hsl(204, 100%, 40%);
         }
 

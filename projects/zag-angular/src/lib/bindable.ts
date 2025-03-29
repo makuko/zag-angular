@@ -1,4 +1,4 @@
-import { computed, signal } from '@angular/core';
+import { computed, effect, signal } from '@angular/core';
 import { type Bindable, type BindableParams } from '@zag-js/core';
 import { isFunction } from '@zag-js/utils';
 
@@ -42,3 +42,18 @@ export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
         }
     };
 }
+
+bindable.cleanup = (fn: VoidFunction) => {
+    effect(onCleanup => onCleanup(fn));
+};
+
+bindable.ref = <T>(defaultValue: T) => {
+    let value = defaultValue;
+
+    return {
+        get: () => value,
+        set: (next: T) => {
+            value = next;
+        }
+    };
+};

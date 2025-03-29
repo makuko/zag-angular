@@ -1,4 +1,4 @@
-import { Component, computed, contentChildren, effect, inject, input, model, Signal } from '@angular/core';
+import { Component, computed, contentChildren, effect, inject, input, model, OnInit, Signal } from '@angular/core';
 import * as accordion from '@zag-js/accordion';
 import { createId, normalizeProps, useMachine, ZagIt } from 'zag-angular';
 import { AccordionItemComponent } from './accordion-item.component';
@@ -11,7 +11,7 @@ import { AccordionItemComponent } from './accordion-item.component';
     `,
     hostDirectives: [ZagIt]
 })
-export class AccordionComponent {
+export class AccordionComponent implements OnInit {
 
     public readonly value = model<string[]>([]);
 
@@ -43,14 +43,20 @@ export class AccordionComponent {
 
         this.zagIt.next = computed(() => this.api().getRootProps());
 
-        effect(() => {
-            for (const item of this.items()) {
-                // @ts-expect-error Initialization
-                item.id = this.id;
-                // @ts-expect-error Initialization
-                item.accordionApi = this.api;
-            }
-        });
+        effect(() => this.initItems());
+    }
+
+    public ngOnInit() {
+        // This is important to ensure access to API in AccordionItemComponent's ngOnInit
+        // because effect initially runs later and thus accordionApi would be undefined.
+        this.initItems();
+    }
+
+    private initItems() {
+        for (const item of this.items()) {
+            // @ts-expect-error Initialization
+            item.accordionApi = this.api;
+        }
     }
 
 }

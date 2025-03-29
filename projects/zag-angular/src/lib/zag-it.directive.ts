@@ -1,7 +1,7 @@
 import {
-    afterRenderEffect,
     computed,
     Directive,
+    effect,
     ElementRef,
     inject,
     input,
@@ -31,14 +31,12 @@ export class ZagIt implements OnDestroy {
     private elementRef = inject(ElementRef<HTMLElement>);
 
     constructor() {
-        afterRenderEffect({
-            write: () => {
-                const prev = this.prev;
-                const next = this.prev = this.next();
+        effect(() => {
+            const prev = this.prev;
+            const next = this.prev = this.next();
 
-                if (!isEqual(prev, next)) {
-                    this.handleAttrs(prev, next);
-                }
+            if (!isEqual(prev, next)) {
+                this.handleAttrs(prev, next);
             }
         });
     }

@@ -42,7 +42,7 @@ import { TooltipComponent } from './tooltip/tooltip.component';
 
         <div class='container'>
             @if (showAccordion) {
-                <app-accordion [multiple]="true" [collapsible]="true" [value]="['item1', 'item2']">
+                <app-accordion [multiple]="true" [collapsible]="true" [value]="accordionValue">
                     <app-accordion-item value="item1">
                         <app-accordion-header>
                             Header 1
@@ -73,6 +73,7 @@ import { TooltipComponent } from './tooltip/tooltip.component';
 
         <div class="container">
             <button (click)="showAccordion = !showAccordion">Toggle Accordion</button>
+            <button (click)="setValue()">Set Value</button>
         </div>
 
         <div class=container>
@@ -90,6 +91,12 @@ import { TooltipComponent } from './tooltip/tooltip.component';
 export class AppComponent {
 
     public showAccordion = false;
+
+    public accordionValue = ['item1', 'item2'];
+
+    public setValue() {
+        this.accordionValue = ['item2'];
+    }
 
     public showToast() {
         toaster.create({

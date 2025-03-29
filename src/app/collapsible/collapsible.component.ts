@@ -44,8 +44,4 @@ export class CollapsibleComponent {
         effect(() => this.content().api = this.api);
     }
 
-    public ngAfterViewInit() {
-        this.api().measureSize();
-    }
-
 }

@@ -1,6 +1,7 @@
-import { Component, computed, inject, signal, Signal } from '@angular/core';
+import { Component, computed, inject, Signal } from '@angular/core';
 import { Api as AccordionApi } from '@zag-js/accordion';
 import { Api as CollapsibleApi } from '@zag-js/collapsible';
+import { splitProps } from '@zag-js/utils';
 import { mergeProps, ZagIt } from 'zag-angular';
 
 @Component({
@@ -53,19 +54,22 @@ export class AccordionContentComponent {
 
     private readonly accordionApi!: Signal<AccordionApi>;
 
-    private readonly collapsibleApi = signal<CollapsibleApi | undefined>(undefined);
+    private readonly collapsibleApi!: Signal<CollapsibleApi>;
 
     private readonly zagIt = inject(ZagIt);
 
     constructor() {
         this.zagIt.next = computed(() => {
-            const accordionContentProps = this.accordionApi().getItemContentProps({ value: this.value() });
-            const collapsibleContentProps = this.collapsibleApi()?.getContentProps() ?? {};
+            const collapsibleContentProps = this.collapsibleApi().getContentProps() ?? {};
+            const [, accordionItemContentProps] = splitProps(
+                this.accordionApi().getItemContentProps({ value: this.value() }),
+                ['hidden', 'data-state']
+            );
 
-            delete accordionContentProps['data-state'];
-            delete collapsibleContentProps['data-scope'];
-
-            return mergeProps(accordionContentProps, collapsibleContentProps);
+            return mergeProps(
+                collapsibleContentProps,
+                accordionItemContentProps
+            );
         });
     }
 

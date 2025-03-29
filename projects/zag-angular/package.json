@@ -16,9 +16,9 @@
   "peerDependencies": {
     "@angular/common": "^19.2.0",
     "@angular/core": "^19.2.0",
-    "@zag-js/core": "^1.6.0",
-    "@zag-js/types": "^1.6.0",
-    "@zag-js/utils": "^1.6.0"
+    "@zag-js/core": "^1.7.0",
+    "@zag-js/types": "^1.7.0",
+    "@zag-js/utils": "^1.7.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

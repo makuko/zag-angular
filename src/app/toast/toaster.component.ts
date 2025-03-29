@@ -34,7 +34,6 @@ export class ToasterComponent {
     private readonly zagIt = inject(ZagIt);
 
     constructor() {
-        toast.group.machine.debug = true;
         this.service = useMachine(
             toast.group.machine,
             {
