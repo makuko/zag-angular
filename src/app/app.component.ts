@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { createId } from 'zag-angular';
-import { AccordionComponent, AccordionContentComponent, AccordionHeaderComponent, AccordionItemComponent } from './accordion';
+import { AccordionComponent, AccordionContentComponent, AccordionHeaderComponent, AccordionItemComponent } from './accordion2';
 import { CollapsibleComponent, CollapsibleContentComponent, CollapsibleTriggerComponent } from './collapsible';
 import { MenuComponent } from './menu/menu.compponent';
 import { toaster, ToasterComponent } from './toast';
