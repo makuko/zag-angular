@@ -58,6 +58,9 @@ export function useMachine<T extends MachineSchema>(
         },
         getRefs() {
             return refs;
+        },
+        getEvent() {
+            return getEvent();
         }
     });
 
