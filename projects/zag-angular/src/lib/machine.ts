@@ -85,16 +85,16 @@ export function useMachine<T extends MachineSchema>(
     let effectsRef = new Map<string, VoidFunction>();
     let transitionRef: Transition<any> | null = null;
 
-    let previousEventRef: any = null;
-    let eventRef = { type: '' };
+    let previousEventRef: { current: any; } = { current: null };
+    let eventRef: { current: any; } = { current: { type: '' } };
 
     const getEvent = () => ({
-        ...eventRef,
+        ...eventRef.current,
         current() {
-            return eventRef;
+            return eventRef.current;
         },
         previous() {
-            return previousEventRef;
+            return previousEventRef.current;
         }
     });
 
@@ -203,7 +203,7 @@ export function useMachine<T extends MachineSchema>(
 
         return machine.computed[key]({
             context: ctx,
-            event: eventRef,
+            event: eventRef.current,
             prop,
             refs,
             scope: scope(),
@@ -287,8 +287,8 @@ export function useMachine<T extends MachineSchema>(
                 return;
             }
 
-            previousEventRef = eventRef;
-            eventRef = event;
+            previousEventRef.current = eventRef.current;
+            eventRef.current = event;
 
             debug('send', event);
 
