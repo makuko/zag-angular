@@ -14,11 +14,11 @@
   "author": "Markus Schmidt <markus.schmidt.84@gmail.com>",
   "repository": "makuko/zag-angular",
   "peerDependencies": {
-    "@angular/common": "^20.3.2",
-    "@angular/core": "^20.3.2",
-    "@zag-js/core": "^1.25.0",
-    "@zag-js/types": "^1.25.0",
-    "@zag-js/utils": "^1.25.0"
+    "@angular/common": "^21.2.10",
+    "@angular/core": "^21.2.10",
+    "@zag-js/core": "^1.40.0",
+    "@zag-js/types": "^1.40.0",
+    "@zag-js/utils": "^1.40.0"
   },
   "dependencies": {
     "tslib": "^2.8.1"

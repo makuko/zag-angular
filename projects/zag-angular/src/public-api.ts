@@ -5,5 +5,5 @@ export { mergeProps } from '@zag-js/core';
 export * from './lib/create-id';
 export * from './lib/machine';
 export * from './lib/normalize-props';
+export * from './lib/use-sync-external-store';
 export * from './lib/zag-it.directive';
-

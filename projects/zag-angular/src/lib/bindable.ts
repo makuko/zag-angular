@@ -2,7 +2,7 @@ import { computed, effect, signal } from '@angular/core';
 import { type Bindable, type BindableParams } from '@zag-js/core';
 import { isFunction } from '@zag-js/utils';
 
-export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
+export function createBindable<T>(props: () => BindableParams<T>): Bindable<T> {
     const initial = props().value ?? props().defaultValue;
 
     const eq = props().isEqual ?? Object.is;
@@ -43,11 +43,11 @@ export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
     };
 }
 
-bindable.cleanup = (fn: VoidFunction) => {
+createBindable.cleanup = (fn: VoidFunction) => {
     effect(onCleanup => onCleanup(fn));
 };
 
-bindable.ref = <T>(defaultValue: T) => {
+createBindable.ref = <T>(defaultValue: T) => {
     let value = defaultValue;
 
     return {

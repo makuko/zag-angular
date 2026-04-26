@@ -1,4 +1,4 @@
-import { afterRenderEffect, computed as computedSignal, isSignal, untracked, type Signal } from '@angular/core';
+import { afterRenderEffect, isSignal, computed as ngComputed, untracked, type Signal } from '@angular/core';
 import type {
     ActionsOrFn,
     BindableContext,
@@ -9,21 +9,29 @@ import type {
     Machine,
     MachineSchema,
     Params,
-    Service,
-    Transition,
+    Service
 } from '@zag-js/core';
-import { createScope, INIT_STATE, MachineStatus } from '@zag-js/core';
+import {
+    createScope,
+    findTransition,
+    getExitEnterStates,
+    hasTag,
+    INIT_STATE,
+    MachineStatus,
+    matchesState,
+    resolveStateValue
+} from "@zag-js/core";
 import { compact, ensure, isFunction, isString, toArray, warn } from '@zag-js/utils';
-import { bindable } from './bindable';
+import { createBindable } from './bindable';
 import { createRefs } from './refs';
-import { track } from './track';
+import { createTrack } from './track';
 
 export function useMachine<T extends MachineSchema>(
     machine: Machine<T>,
     userProps: Partial<T['props']> | Signal<Partial<T['props']>> = {}
 ): Service<T> {
-    const scope = computedSignal(() => {
-        const { id, ids, getRootNode } = access<any>(userProps);
+    const scope = ngComputed(() => {
+        const { id, ids, getRootNode } = access(userProps) as any;
 
         return createScope({ id, ids, getRootNode });
     });
@@ -34,18 +42,18 @@ export function useMachine<T extends MachineSchema>(
         }
     };
 
-    const props = computedSignal(
+    const props = ngComputed(
         () => machine.props?.({
             props: compact(access(userProps)),
             scope: scope()
         }) ?? access(userProps)
     );
 
-    const prop = useProp<T['props']>(props);
+    const prop = createProp<T['props']>(props);
 
     const context = machine.context?.({
         prop,
-        bindable,
+        bindable: createBindable,
         get scope() {
             return scope();
         },
@@ -64,7 +72,6 @@ export function useMachine<T extends MachineSchema>(
         }
     });
 
-    // TODO: Make typesafe
     const ctx: BindableContext<T> = {
         get(key) {
             return context?.[key].get() as any;
@@ -82,11 +89,11 @@ export function useMachine<T extends MachineSchema>(
         }
     };
 
-    let effectsRef = new Map<string, VoidFunction>();
-    let transitionRef: Transition<any> | null = null;
+    const effects = { current: new Map<string, VoidFunction>() };
+    const transitionRef: { current: any; } = { current: null };
 
-    let previousEventRef: { current: any; } = { current: null };
-    let eventRef: { current: any; } = { current: { type: '' } };
+    const previousEventRef: { current: any; } = { current: null };
+    const eventRef: { current: any; } = { current: { type: '' } };
 
     const getEvent = () => ({
         ...eventRef.current,
@@ -101,10 +108,14 @@ export function useMachine<T extends MachineSchema>(
     const getState = () => ({
         ...state,
         matches(...values: T['state'][]) {
-            return values.includes(state.get());
+            const current = state.get();
+
+            return values.some((value) => matchesState(current as string, value as string));
         },
         hasTag(tag: T['tag']) {
-            return !!machine.states[state.get()]?.tags?.includes(tag);
+            const current = state.get();
+
+            return hasTag(machine, current, tag);
         }
     });
 
@@ -118,7 +129,7 @@ export function useMachine<T extends MachineSchema>(
         send,
         action,
         guard,
-        track,
+        track: createTrack,
         refs,
         computed,
         flush,
@@ -151,7 +162,11 @@ export function useMachine<T extends MachineSchema>(
     };
 
     const guard = (str: T['guard'] | GuardFn<T>) => {
-        return isFunction(str) ? str(getParams()) : machine.implementations?.guards?.[str](getParams());
+        if (isFunction(str)) {
+            return str(getParams());
+        }
+
+        return machine.implementations?.guards?.[str](getParams());
     };
 
     const effect = (keys?: EffectsOrFn<T>) => {
@@ -201,7 +216,9 @@ export function useMachine<T extends MachineSchema>(
     const computed: ComputedFn<T> = key => {
         ensure(machine.computed, () => `[zag-js] No computed object found on machine`);
 
-        return machine.computed[key]({
+        const fn = machine.computed[key];
+
+        return fn({
             context: ctx,
             event: eventRef.current,
             prop,
@@ -211,47 +228,45 @@ export function useMachine<T extends MachineSchema>(
         });
     };
 
-    const state = bindable(() => ({
-        defaultValue: machine.initialState({ prop }),
+    const state = createBindable(() => ({
+        defaultValue: resolveStateValue(machine, machine.initialState({ prop })),
         onChange(nextState, prevState) {
-            // compute effects: exit -> transition -> enter
+            const { exiting, entering } = getExitEnterStates(machine, prevState, nextState, transitionRef.current?.reenter);
 
-            // exit effects
-            if (prevState) {
-                const exitEffects = effectsRef.get(prevState);
+            exiting.forEach((item) => {
+                const exitEffects = effects.current.get(item.path);
 
                 exitEffects?.();
-                effectsRef.delete(prevState);
-            }
+                effects.current.delete(item.path);
+            });
 
-            // exit actions
-            if (prevState) {
-                action(machine.states[prevState]?.exit);
-            }
+            exiting.forEach((item) => {
+                action(item.state?.exit);
+            });
 
-            // transition actions
-            action(transitionRef?.actions);
+            action(transitionRef.current?.actions);
 
-            // enter effect
-            const cleanup = effect(machine.states[nextState]?.effects);
+            entering.forEach((item) => {
+                const cleanup = effect(item.state?.effects);
 
-            if (cleanup) {
-                effectsRef.set(nextState!, cleanup);
-            }
+                if (cleanup) {
+                    effects.current.set(item.path, cleanup);
+                }
+            });
 
-            // root entry actions
             if (prevState === INIT_STATE) {
                 action(machine.entry);
 
                 const cleanup = effect(machine.effects);
 
                 if (cleanup) {
-                    effectsRef.set(INIT_STATE, cleanup);
+                    effects.current.set(INIT_STATE, cleanup);
                 }
             }
 
-            // enter actions
-            action(machine.states[nextState]?.entry);
+            entering.forEach((item) => {
+                action(item.state?.entry);
+            });
         }
     }));
 
@@ -271,16 +286,17 @@ export function useMachine<T extends MachineSchema>(
 
             status = MachineStatus.Stopped;
 
-            effectsRef.forEach(fn => fn());
+            const fns = effects.current;
 
-            effectsRef = new Map();
-            transitionRef = null;
+            fns.forEach(fn => fn());
+
+            effects.current = new Map();
+            transitionRef.current = null;
 
             action(machine.exit);
         });
     });
 
-    // TODO: Add EventType
     const send = (event: any) => {
         queueMicrotask(() => {
             if (status !== MachineStatus.Started) {
@@ -290,25 +306,22 @@ export function useMachine<T extends MachineSchema>(
             previousEventRef.current = eventRef.current;
             eventRef.current = event;
 
-            debug('send', event);
-
             const currentState = state.get();
 
-            // @ts-expect-error index signature
-            const transitions = machine.states[currentState].on?.[event.type] ?? machine.on?.[event.type];
-
+            const { transitions, source } = findTransition(machine, currentState, event.type as string);
             const transition = choose(transitions);
 
             if (!transition) {
                 return;
             }
 
-            debug('transition', transition);
-
             // save current transition
-            transitionRef = transition;
+            transitionRef.current = transition;
 
-            const target = transition.target ?? currentState;
+            const target = resolveStateValue(machine, transition.target ?? currentState, source);
+
+            debug('transition"', event.type, transition.target || currentState, `(${ transition.actions })`);
+
             const changed = target !== currentState;
 
             if (changed) {
@@ -349,7 +362,7 @@ function access<T>(value: T | Signal<T>) {
     return isSignal(value) ? value() : value;
 }
 
-function useProp<T>(value: Signal<T>) {
+function createProp<T>(value: Signal<T>) {
     return function get<K extends keyof T>(key: K): T[K] {
         return value()[key];
     };

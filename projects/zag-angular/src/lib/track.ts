@@ -1,15 +1,15 @@
-import { effect } from '@angular/core';
+import { effect as ngEffect } from '@angular/core';
 import { isEqual, isFunction } from '@zag-js/utils';
 
 function access<T>(value: T | (() => T)): T {
     return isFunction(value) ? value() : value;
 }
 
-export const track = (deps: any[], _effect: VoidFunction) => {
+export const createTrack = (deps: any[], effect: VoidFunction) => {
     let prevDeps: any[] = [];
     let isFirstRun = true;
 
-    effect(() => {
+    ngEffect(() => {
         if (isFirstRun) {
             prevDeps = deps.map(d => access(d));
             isFirstRun = false;
@@ -30,7 +30,7 @@ export const track = (deps: any[], _effect: VoidFunction) => {
         if (changed) {
             prevDeps = deps.map(d => access(d));
 
-            _effect();
+            effect();
         }
     });
 };
