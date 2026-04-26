@@ -88,10 +88,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/zag-angular/ng-package.json"
-          },
+          "builder": "@angular/build:ng-packagr",
           "configurations": {
             "production": {
               "tsConfig": "projects/zag-angular/tsconfig.lib.prod.json"
@@ -103,13 +100,9 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/zag-angular/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "tsConfig": "projects/zag-angular/tsconfig.spec.json"
           }
         },
         "lint": {
